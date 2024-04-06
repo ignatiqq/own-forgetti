@@ -16,7 +16,9 @@
     "forgetti",
     "own-react-forget",
     "react",
-    "react-babel"
+    "react-babel",
+    "babel",
+    "optimization-babel"
   ],
   "author": "ignatiqq",
   "license": "MIT",

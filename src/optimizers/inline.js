@@ -1,7 +1,16 @@
 const t = require('@babel/types');
 const {isPathNodeValid} = require('../traverse/utils');
 
-module.exports = function inlineExpression (parentPath, path) {
+module.exports = module.export = function inlineExpressions(path) {
+    path.traverse({
+    // check for callExpressions (hooks and functions)
+    Expression (exprPath) {
+      inlineExpression(path, exprPath);
+    }
+  });
+}
+
+function inlineExpression (parentPath, path) {
     // don't want to check nested expressions
     if (path.getFunctionParent() !== parentPath) return;
   

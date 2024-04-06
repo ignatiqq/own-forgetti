@@ -1,9 +1,15 @@
 const t = require("@babel/types");
 const { getImportSpecifierName, isFunction, unwrapPath } = require("./traverse/utils");
-const inlineExpression = require('./optimizers/inline');
+const inlineExpressions = require('./optimizers/inline');
+
+function isHook(ctx, name) {
+  return ctx.filters.hook.source.test(name);
+}
+
+module.exports = {isHook}
 
 function isHookOrComponent (ctx, name) {
-  return ctx.filters.component.source.test(name) || ctx.filters.hook.source.test(name);
+  return ctx.filters.component.source.test(name) || isHook(ctx, name);
 }
 
 function registerHookSpecifiers (ctx, path, hook) {
@@ -47,12 +53,7 @@ function transformFunction (ctx, path) {
 
   // optimize steps:
   // 1. inline expressions
-  path.traverse({
-    // check for callExpressions (hooks and functions)
-    Expression (exprPath) {
-      inlineExpression(path, exprPath);
-    }
-  });
+  inlineExpressions(path);
 }
 
 // for const Component = () => {} notation
