@@ -5,6 +5,11 @@ function Example (props) {
 
   const cond = props.hello ? 'hello' : 'world';
 
+  const condition1 = -12 ? 123 : '';
+  if(false) return true;
+  const condition2 = '' || 'no' || '';
+  const condiotion3 = true ? 'yes': 'no';
+
   if (condition) return;
 
   const greeting = props.greeting;

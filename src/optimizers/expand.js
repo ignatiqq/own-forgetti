@@ -4,5 +4,5 @@ module.exports = function expandExpressions(ctx, path) {
             const parent = p.getFunctionParent();
             const statement = p.getStatementParent();
         }
-    })
-}
+    });
+};

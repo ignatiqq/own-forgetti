@@ -1,5 +1,5 @@
-const t = require('@babel/types');
-const {isPathNodeValid} = require('../traverse/utils');
+const t = require("@babel/types");
+const {isPathNodeValid} = require("../traverse/utils");
 
 module.exports = module.export = function inlineExpressions(path) {
     path.traverse({
@@ -8,7 +8,7 @@ module.exports = module.export = function inlineExpressions(path) {
       inlineExpression(path, exprPath);
     }
   });
-}
+};
 
 function inlineExpression (parentPath, path) {
     // don't want to check nested expressions
@@ -37,7 +37,7 @@ function inlineExpression (parentPath, path) {
             // has initializator
             binding.path.node.init &&
             // hase declarator var
-            isPathNodeValid(binding.path.get('id'), t.isIdentifier) &&
+            isPathNodeValid(binding.path.get("id"), t.isIdentifier) &&
             // in single scope
             binding.path.scope.getBlockParent() === ref.scope.getBlockParent()
           ) {
