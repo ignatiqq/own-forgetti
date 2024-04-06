@@ -98,7 +98,7 @@ function inlineExpression(parentPath, path) {
           // has initializator
           binding.path.node.init &&
           // hase declarator var
-          isPathNodeValid(binding.path.id, t.isVariableDeclarator) &&
+          isPathNodeValid(binding.path.id, t.isIdentifier) &&
           // in single scope
           binding.path.scope.getBlockParent() === ref.scope.getBlockParent()
         ) {
