@@ -1,0 +1,32 @@
+{
+  "name": "simplified-react-forgetti",
+  "version": "0.0.1",
+  "description": "Simplified clone of the 'forgetti' package to undesrtand how it works",
+  "main": "./src/core.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignatiqq/own-forgetti.git"
+  },
+  "keywords": [
+    "react-forget",
+    "forgetti",
+    "own-react-forget",
+    "react",
+    "react-babel"
+  ],
+  "author": "ignatiqq",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ignatiqq/own-forgetti/issues"
+  },
+  "homepage": "https://github.com/ignatiqq/own-forgetti#readme",
+  "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/types": "^7.24.0",
+    "@types/react": "^18.2.74"
+  }
+}
