@@ -1,18 +1,9 @@
 const t = require("@babel/types");
-const { getImportSpecifierName, isFunction, unwrapPath } = require("./traverse/utils");
+const { getImportSpecifierName, isFunction, unwrapPath } = require("./utils/utils");
 const inlineExpressions = require("./optimizers/inline");
 const simplifyExpressions = require("./optimizers/simplify");
 const expandExpressions = require("./optimizers/expand");
-
-function isHook(ctx, name) {
-  return ctx.filters.hook.source.test(name);
-}
-
-module.exports = {isHook};
-
-function isHookOrComponent (ctx, name) {
-  return ctx.filters.component.source.test(name) || isHook(ctx, name);
-}
+const {isHook, isHookOrComponent} = require("./utils/isHook");
 
 function registerHookSpecifiers (ctx, path, hook) {
   if (path.node.specifiers.length === 0) return;
@@ -123,4 +114,4 @@ module.exports = function () {
     }
   };
   return res;
-};
+}, {isHook};

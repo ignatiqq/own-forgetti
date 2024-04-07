@@ -9,7 +9,7 @@ function getBooleanStateOfNode(node) {
         case "BooleanLiteral":
             return node.value ? "truthy" : "falsy";
         case "NumericLiteral":
-            return node.value <= 0 ? "falsy" : "truthy";
+            return node.value === 0 ? "falsy" : "truthy";
         case "NullLiteral":
             return "falsy";
         case "StringLiteral":

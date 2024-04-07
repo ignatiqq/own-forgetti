@@ -1,5 +1,5 @@
 const t = require("@babel/types");
-const {isPathNodeValid} = require("../traverse/utils");
+const {isPathNodeValid} = require("../utils/utils");
 
 module.exports = module.export = function inlineExpressions(path) {
     path.traverse({
