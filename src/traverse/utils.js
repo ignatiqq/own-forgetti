@@ -25,4 +25,4 @@ function unwrapPath (path, type) {
   return null;
 }
 
-module.exports = {getImportSpecifierName, isFunction, isPathNodeValid, unwrapPath}
+module.exports = {getImportSpecifierName, isFunction, isPathNodeValid, unwrapPath};

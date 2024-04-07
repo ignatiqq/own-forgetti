@@ -2,6 +2,7 @@ const t = require("@babel/types");
 const { getImportSpecifierName, isFunction, unwrapPath } = require("./traverse/utils");
 const inlineExpressions = require("./optimizers/inline");
 const simplifyExpressions = require("./optimizers/simplify");
+const expandExpressions = require("./optimizers/expand");
 
 function isHook(ctx, name) {
   return ctx.filters.hook.source.test(name);
@@ -26,18 +27,31 @@ function registerHookSpecifiers (ctx, path, hook) {
         }
         break;
       }
+
+      case "ImportNamespaceSpecifier":
+      case "ImportDefaultSpecifier": {
+        if(specifier.local.name) {
+          // Track list of hooks which can be used from specifier
+          let key = ctx.registrations.hooks.namespaces.get(specifier.local);
+
+          if(!key) key = [];
+          key.push(hook);
+          ctx.registrations.hooks.namespaces.set(specifier.local, key);
+          break;
+        }
+      }
     }
   }
 }
 
 function extractImportIdentifiers (ctx, path) {
-  // name of default specifier path name
+  // name of default specifier path name import React from ("react") <- source
   const importPath = path.node.source.value;
 
   // Identify hooks
   const { imports } = ctx.preset;
   // search for any hook in config
-  for (let i = 0, len = imports.hooks.length; i < len; i++) {
+  for (let i = 0; i < imports.hooks.length; i++) {
     const hook = imports.hooks[i];
     // check for ('react') import path from preset
     if (importPath === hook.source) {
@@ -56,6 +70,7 @@ function transformFunction (ctx, path) {
   // 1. inline expressions
   inlineExpressions(path);
   simplifyExpressions(path);
+  expandExpressions(ctx, path);
 }
 
 // for const Component = () => {} notation
@@ -77,7 +92,10 @@ module.exports = function () {
           preset,
           registrations: {
             hooks: {
-              identifiers: new Map()
+              // import {useMemo} from 'react';
+              identifiers: new Map(),
+              // import React from 'react'; || import * as React from 'react;
+              namespaces: new Map()
             }
           },
           filters: preset.filters

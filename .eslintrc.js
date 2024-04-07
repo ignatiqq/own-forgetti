@@ -5,6 +5,9 @@ module.exports = {
   },
   overrides: [
   ],
+  extends: [
+    "plugin:react/recommended",
+  ],
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module"
