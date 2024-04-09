@@ -9,16 +9,6 @@ const presets = {
       }
     },
     runtime: {
-      useRef: {
-        name: "useRef",
-        source: "react",
-        kind: "named"
-      },
-      useMemo: {
-        name: "useMemo",
-        source: "react",
-        kind: "named"
-      },
       memo: {
         name: "memo",
         source: "react",

@@ -3,6 +3,7 @@ const { getImportSpecifierName, isFunction, unwrapPath } = require("./utils/util
 const inlineExpressions = require("./optimizers/inline");
 const simplifyExpressions = require("./optimizers/simplify");
 const expandExpressions = require("./optimizers/expand");
+const optimizeJSX = require("./optimizers/optimizeJSX");
 const {isHook, isHookOrComponent} = require("./utils/isHook");
 
 function registerHookSpecifiers (ctx, path, hook) {
@@ -62,6 +63,7 @@ function transformFunction (ctx, path) {
   inlineExpressions(path);
   simplifyExpressions(path);
   expandExpressions(ctx, path);
+  optimizeJSX(ctx, path);
 }
 
 // for const Component = () => {} notation

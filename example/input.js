@@ -25,8 +25,10 @@ function Example (props) {
 
   const str = `${greeting}, ${receiver} ${cond}`;
   return (
-    <div>
+    <Component val={<div val={fnn()}></div>}>
+      <div val={fn()}>
         { str }
-    </div>
+      </div>    
+    </Component>
   );
 }

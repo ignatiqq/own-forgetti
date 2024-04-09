@@ -4,7 +4,7 @@ const getHookCallType = require("../utils/getHookCallType");
 
 module.exports = function expandExpressions(ctx, path) {
     path.traverse({
-        
+        // make hooks hoisted
         CallExpression(p) {
             const parent = p.getFunctionParent();
             const statement = p.getStatementParent();
