@@ -56,7 +56,6 @@ function extractJSXExpressionsFromJSXElement(path, state) {
             // another expression (component) found
             state.expressions.push(t.identifier(name));
             // push extracted jsx to optimize to state
-            console.log("???", state.jsx);
             state.jsx.push({
                 id,
                 // source стейта это переменная где хранятся все значение вычленненные из нее (для оптимизации)
@@ -85,7 +84,7 @@ function extractJSXExpressions(path, state) {
     }
 }
 
-function transformJSX(ctx, path) {
+function transformJSX(ctx, path, memoDefinition) {
     // runs on every jsx element to extract Component to var (if Component) and attributes of jsx
     const state = {
         source: path.scope.generateUidIdentifier("values"),
@@ -104,10 +103,43 @@ function transformJSX(ctx, path) {
     */
     extractJSXExpressions(path, state);
 
+    // Create blocks with declarations of Components
+    // let body;
+    if(state.jsx.length > 0) {
+        const declarations = [];
+        // create component variables
+        for(let component of state.jsx) {
+            declarations.push(t.variableDeclarator(component.id, component.value));
+        }
+        body = t.blockStatement([
+            t.variableDeclaration("const", declarations),
+            t.returnStatement(path.node)
+        ]);
+    } else {
+        body = path.node;
+    }
+
+    // find for root path (Program);
+    const root = getRootStatementPath(path);
+
     // generate memo var (actually just node) in scope
     const memoComponent = path.scope.generateUidIdentifier(getParentFunctionName(path) || "Memo");
 
-    console.log("state after extracting \n\n\n: ", state);
+    // register scope
+    root.scope.registerDeclaration(
+        root.insertBefore(
+            t.variableDeclaration("const", [
+                t.variableDeclarator(
+                    memoComponent,
+                    // call core runtimne $$memo fn
+                    t.callExpression(getImportIdentifier(ctx, path, RUNTIME_MEMO), [
+                      getImportIdentifier(ctx, path, memoDefinition)
+                    ])
+                    
+                )
+            ])
+        )
+    );
 }
 
 /**
@@ -126,7 +158,7 @@ module.exports = function optimizeJSX(ctx, path) {
 
             if(!memoDefinition) return;
             
-            transformJSX(ctx, p);
+            transformJSX(ctx, p, memoDefinition);
         },
         // Yes, fragment has different type
         JSXFragment(p) {
@@ -135,10 +167,63 @@ module.exports = function optimizeJSX(ctx, path) {
     });
 };
 
+const RUNTIME_MEMO = {
+  name: "$$memo",
+  source: "forgetti/runtime",
+};
 
 
+function getRootStatementPath(path) {
+    let current = path.parentPath;
+    while (current) {
+      const next = current.parentPath;
+      if (next && t.isProgram(next.node)) {
+        return current;
+      }
+      current = next;
+    }
+    return path;
+}
 
+function getImportIdentifier(ctx, path, registration) {
+  const name = registration.name;
+  // forgetti/*[name]
+  const target = `${registration.source}[${name}]`;
+  // get collected states in file from ctx
+  const imports = ctx.imports.get(target);
+  
+  // if we have key ("import") such that
+  if(imports) return imports;
 
+  const uid = createRuntimeImportDeclaration(ctx, registration);
+  ctx.imports.set(target, uid);
+}
+
+function createRuntimeImportDeclaration(path, registration) {
+  // get scope of programm node
+  const programParent = path.scope;
+  // generate new uid with name of runtime value
+  const uid = programParent.generateUidIdentifier(registration.name);
+
+  const container = programParent.path.container;
+
+  const importDeclaration = t.importDeclaration(
+    // specifiers
+    [t.importSpecifier(uid, t.identifier(registration.name))],
+    // source
+    t.stringLiteral(registration.source)
+  );
+
+  // add importDeclaration to Program.body
+  container.push(
+    importDeclaration
+  );
+  
+  // register node in scope
+  programParent.scope.registerDeclaration(importDeclaration);
+  
+  return uid;
+}
 
 function getParentFunctionName(
   path,
