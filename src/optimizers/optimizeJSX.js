@@ -135,7 +135,6 @@ function transformJSX(ctx, path, memoDefinition) {
                     t.callExpression(getImportIdentifier(ctx, path, RUNTIME_MEMO), [
                       getImportIdentifier(ctx, path, memoDefinition)
                     ])
-                    
                 )
             ])
         )
@@ -195,35 +194,32 @@ function getImportIdentifier(ctx, path, registration) {
   // if we have key ("import") such that
   if(imports) return imports;
 
-  const uid = createRuntimeImportDeclaration(ctx, registration);
+  const uid = createRuntimeImportDeclaration(path, registration);
   ctx.imports.set(target, uid);
+  
+  return uid;
 }
 
 function createRuntimeImportDeclaration(path, registration) {
   // get scope of programm node
-  const programParent = path.scope;
+  const programParent = path.scope.getProgramParent();
   // generate new uid with name of runtime value
   const uid = programParent.generateUidIdentifier(registration.name);
 
-  const container = programParent.path.container;
-
-  const importDeclaration = t.importDeclaration(
+  // get path from scope node
+  const newPath = programParent.path.unshiftContainer("body", t.importDeclaration(
     // specifiers
     [t.importSpecifier(uid, t.identifier(registration.name))],
     // source
     t.stringLiteral(registration.source)
-  );
+  ))[0];
 
-  // add importDeclaration to Program.body
-  container.push(
-    importDeclaration
-  );
-  
-  // register node in scope
-  programParent.scope.registerDeclaration(importDeclaration);
-  
+
+  programParent.registerDeclaration(newPath);
+
   return uid;
 }
+
 
 function getParentFunctionName(
   path,
