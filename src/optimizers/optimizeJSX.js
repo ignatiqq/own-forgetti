@@ -133,11 +133,13 @@ function transformJSX(ctx, path, memoDefinition) {
                     memoComponent,
                     // call core runtimne $$memo fn
                     t.callExpression(getImportIdentifier(ctx, path, RUNTIME_MEMO), [
-                      getImportIdentifier(ctx, path, memoDefinition)
+                      getImportIdentifier(ctx, path, memoDefinition),
+                      t.stringLiteral(memoComponent.name),
+                      t.arrowFunctionExpression([state.source], body),
                     ])
                 )
             ])
-        )
+        )[0],
     );
 }
 
@@ -196,7 +198,7 @@ function getImportIdentifier(ctx, path, registration) {
 
   const uid = createRuntimeImportDeclaration(path, registration);
   ctx.imports.set(target, uid);
-  
+  console.log({uid});
   return uid;
 }
 
